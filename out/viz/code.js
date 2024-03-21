@@ -8,9 +8,10 @@ var link, node, circles;
 var graph;
 
 // sets the color of the nodes
-var color = d3.scaleOrdinal(d3.schemeCategory20);
+var color = d3.scaleOrdinal(d3.schemeCategory10);
 
-const STATIC_SIZE = 8;
+const STATIC_SIZE = 5;
+const MAX_STATIC_SIZE = 100;
 const STROKE_COLOR = "#aaa";
 
 var degreeSize;
@@ -37,7 +38,7 @@ d3.json("graph.json", function (error, _graph) {
         return d.degree;
       }),
     ])
-    .range([8, 25]);
+    .range([STATIC_SIZE, MAX_STATIC_SIZE]);
 
   initializeDisplay();
   initializeSimulation();
@@ -345,13 +346,24 @@ function setCentrality(centrality) {
         return d[centrality];
       }),
     ])
-    .range([8, 25]);
+    .range([STATIC_SIZE, MAX_STATIC_SIZE]);
   circles.attr("r", function (d) {
     if (centrality === "static") {
       return STATIC_SIZE;
     }
     return centralitySize(d[centrality]);
   });
+  circles.attr("fill", function (d) {
+    let category = {
+      "degree": "dc_category",
+      "betweenness": "bc_category",
+      "eigenvector": "ec_category",
+    }
+    if (centrality === "static") {
+      return color(d.category);
+    }
+    return d[`${category[centrality]}_category`] ? color(d[`${category[centrality]}_category`]) : color(d.category);
+  })
   // Recalculate collision detection based on selected centrality.
   simulation.force(
     "collide",
@@ -365,11 +377,13 @@ function setCentrality(centrality) {
 function toggleTitleVisiblity() {
   const visibility = document.getElementById("title-visibility").checked;
   const nodes = document.querySelector(".nodes");
+  const top = document.querySelector(".nodes circle[r='100']")
   if (visibility) {
     nodes.classList.remove("hide");
     return;
   }
   nodes.classList.add("hide");
+  top.nextSibling.nextSibling.style.opacity = 1;
 }
 
 // we need to handle a user gesture to use 'open'
