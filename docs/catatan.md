@@ -6,3 +6,6 @@
 3. *Skenario pengujian - ==berisikan tentang skenario yang sudah dibuat (?)==*
 4. Hasil dan analisis - berisikan tentang
 5. Kesimpulan dan saran - berisikan tentang
+
+## Alur Penelitian
+![alt text](./img/alur-penelitian.png)
